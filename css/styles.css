@@ -141,7 +141,7 @@ body {
   overflow-x: hidden;
 }
 
-img { max-width: 100%; display: block; }
+img { max-width: 100%; display: block; image-rendering: -webkit-optimize-contrast; }
 button { cursor: pointer; font-family: inherit; border: none; background: none; }
 a { color: var(--link); text-decoration: none; }
 a:hover { color: var(--link-hover); text-decoration: underline; }
@@ -160,9 +160,7 @@ input, select { font-family: inherit; }
   position: fixed;
   top: 0; left: 0; right: 0;
   height: var(--header-h);
-  background: var(--surface-overlay);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: var(--surface);
   border-bottom: 1px solid var(--border-subtle);
   z-index: 100;
   box-shadow: var(--shadow-2);
@@ -260,9 +258,7 @@ input, select { font-family: inherit; }
   position: fixed;
   bottom: 0; left: 0; right: 0;
   height: var(--nav-h);
-  background: var(--surface-overlay);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: var(--surface);
   border-top: 1px solid var(--border-subtle);
   display: flex;
   align-items: stretch;
@@ -964,8 +960,6 @@ input, select { font-family: inherit; }
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,.55);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
   z-index: 1000;
   display: flex;
   align-items: flex-end;

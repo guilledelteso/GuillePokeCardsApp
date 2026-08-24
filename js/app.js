@@ -241,7 +241,7 @@ const App = (() => {
     const inCol = Storage.isInCollection(card.id);
     const inWish = Storage.isInWishlist(card.id);
     const qty = Storage.getQuantity(card.id);
-    const imgSrc = API.imgLow(card.image);
+    const imgSrc = API.imgHigh(card.image);
     const imgTag = imgSrc
       ? `<img class="card-img loading" src="${imgSrc}" alt="${esc(card.name)}" loading="lazy" onload="this.classList.remove('loading');this.classList.add('loaded');this.previousElementSibling&&this.previousElementSibling.remove()" onerror="this.style.display='none'">`
       : '';
@@ -431,7 +431,7 @@ const App = (() => {
   }
 
   function buildCollectionCardHtml(card, qty) {
-    const imgSrc = API.imgLow(card.image);
+    const imgSrc = API.imgHigh(card.image);
     return `
       <div class="collection-card" data-card-id="${esc(card.id)}">
         <div class="collection-card-img-wrap" data-open-card="${esc(card.id)}">
