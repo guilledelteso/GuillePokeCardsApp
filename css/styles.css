@@ -92,7 +92,7 @@
   --header-h: 56px;
   --nav-h: 68px;
   --sidebar-w: 220px;
-  --max-w: 1280px;
+  --max-w: 1800px;
 
   /* Transitions */
   --ease-fast:   80ms cubic-bezier(.33,0,.67,1);
@@ -125,6 +125,7 @@
 
 /* ─── Reset & Base ────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+[hidden] { display: none !important; }
 
 html {
   font-size: var(--text-base);
@@ -249,8 +250,6 @@ input, select { font-family: inherit; }
 
 .view-content {
   padding: var(--s4);
-  max-width: var(--max-w);
-  margin: 0 auto;
 }
 
 /* ─── Bottom navigation ───────────────────────────────────────────────────── */
@@ -1394,22 +1393,32 @@ input, select { font-family: inherit; }
 
 /* ─── Responsive ──────────────────────────────────────────────────────────── */
 @media (min-width: 768px) {
-  .sets-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
-  .cards-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
-  .collection-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+  .sets-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+  .cards-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+  .collection-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
 }
 
 @media (min-width: 1024px) {
   :root { --header-h: 60px; }
-  .view-content { padding: var(--s6); }
-  .sets-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
-  .cards-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
-  .collection-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+  .view-content { padding: var(--s6) var(--s8); }
+  .sets-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+  .cards-grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+  .collection-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
   .app-nav { display: flex; }
 }
 
-@media (min-width: 1200px) {
-  .app-main { max-width: calc(var(--max-w) + var(--s8)); margin-left: auto; margin-right: auto; }
+@media (min-width: 1400px) {
+  .view-content { padding: var(--s8) var(--s10); }
+  .sets-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+  .cards-grid { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+  .collection-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+}
+
+@media (min-width: 1800px) {
+  .view-content { padding: var(--s8) var(--s12); }
+  .sets-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  .cards-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+  .collection-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
 }
 
 /* ─── Focus visible ───────────────────────────────────────────────────────── */

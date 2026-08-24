@@ -1,4 +1,4 @@
-/* ─── Pokédex TCG — Main App Controller ──────────────────────────────────── */
+/* ─── Guille PokeCards App — Main App Controller ─────────────────────────── */
 
 const App = (() => {
   // ── State ────────────────────────────────────────────────────────────────
@@ -67,8 +67,8 @@ const App = (() => {
       dom.pageTitle.textContent = state.currentSet.name || 'Set';
     } else {
       dom.backBtn.hidden = true;
-      const titles = { browse:'Pokédex TCG', search:'Buscar Cartas', collection:'Mi Colección', wishlist:'Lista de Deseos' };
-      dom.pageTitle.textContent = titles[view] || 'Pokédex TCG';
+      const titles = { browse:'Guille PokeCards App', search:'Buscar Cartas', collection:'Mi Colección', wishlist:'Lista de Deseos' };
+      dom.pageTitle.textContent = titles[view] || 'Guille PokeCards App';
     }
 
     // Render the active view
@@ -152,7 +152,7 @@ const App = (() => {
 
   function buildSetCardHtml(s) {
     const count = s.cardCount?.official ?? s.cardCount?.total ?? '?';
-    const logo = s.logo ? `<img class="set-logo" src="${API.imgUrl(s.logo, 'high', 'png')}" alt="${esc(s.name)}" loading="lazy" onerror="this.parentNode.innerHTML='<span class=set-logo-placeholder>${esc(s.name)}</span>'">` :
+    const logo = s.logo ? `<img class="set-logo" src="${API.logoUrl(s.logo)}" alt="${esc(s.name)}" loading="lazy" onerror="this.parentNode.innerHTML='<span class=set-logo-placeholder>${esc(s.name)}</span>'">` :
       `<span class="set-logo-placeholder">${esc(s.name)}</span>`;
     const date = s.releaseDate ? new Date(s.releaseDate).toLocaleDateString('es-ES', {month:'short', year:'numeric'}) : '';
     return `
@@ -193,7 +193,7 @@ const App = (() => {
     const cards = set.cards || [];
 
     const logoTag = set.logo
-      ? `<img class="set-detail-logo" src="${API.imgUrl(set.logo,'high','png')}" alt="${esc(set.name)}" onerror="this.style.display='none'">`
+      ? `<img class="set-detail-logo" src="${API.logoUrl(set.logo)}" alt="${esc(set.name)}" onerror="this.style.display='none'">`
       : '';
     const date = set.releaseDate ? new Date(set.releaseDate).toLocaleDateString('es-ES', {day:'numeric',month:'long',year:'numeric'}) : '';
 
@@ -243,7 +243,7 @@ const App = (() => {
     const qty = Storage.getQuantity(card.id);
     const imgSrc = API.imgHigh(card.image);
     const imgTag = imgSrc
-      ? `<img class="card-img loading" src="${imgSrc}" alt="${esc(card.name)}" loading="lazy" onload="this.classList.remove('loading');this.classList.add('loaded');this.previousElementSibling&&this.previousElementSibling.remove()" onerror="this.style.display='none'">`
+      ? `<img class="card-img loading" src="${imgSrc}" alt="${esc(card.name)}" loading="lazy" onload="this.classList.remove('loading');this.classList.add('loaded');this.previousElementSibling&&this.previousElementSibling.remove()" onerror="this.style.display='none';this.previousElementSibling&&this.previousElementSibling.remove()">`
       : '';
 
     const types = card.types || [];

@@ -57,6 +57,9 @@ const API = (() => {
     imgHigh(base) { return this.imgUrl(base, 'high', 'webp'); },
     imgLow(base)  { return this.imgUrl(base, 'low',  'webp'); },
 
+    /** Logo URL — logos don't use quality subfolders, just append .png */
+    logoUrl(base) { return base ? `${base}.png` : null; },
+
     /** Clear in-memory cache (useful for forced refresh) */
     clearCache() { cache.clear(); },
   };
