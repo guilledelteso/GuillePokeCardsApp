@@ -1,0 +1,50 @@
+{
+  "name": "GuillePokeCardsApp",
+  "short_name": "GuillePokeCards",
+  "description": "Portal de gestión de cartas Pokémon TCG. Explora sets, gestiona tu colección y lista de deseos.",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a0a1a",
+  "theme_color": "#0078d4",
+  "lang": "es",
+  "dir": "ltr",
+  "categories": ["entertainment", "games"],
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Mi Colección",
+      "short_name": "Colección",
+      "description": "Ver mis cartas",
+      "url": "./?view=collection",
+      "icons": [{"src": "./icons/icon.svg", "sizes": "any"}]
+    },
+    {
+      "name": "Lista de Deseos",
+      "short_name": "Deseos",
+      "description": "Ver lista de deseos",
+      "url": "./?view=wishlist",
+      "icons": [{"src": "./icons/icon.svg", "sizes": "any"}]
+    }
+  ]
+}

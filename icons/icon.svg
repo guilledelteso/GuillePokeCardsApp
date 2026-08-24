@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#1a6fb5"/>
+      <stop offset="100%" stop-color="#003d7a"/>
+    </radialGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="256" fill="url(#bg)"/>
+  <!-- Pokéball top half -->
+  <path d="M256 96 C175 96 106 150 80 224 L432 224 C406 150 337 96 256 96Z" fill="#e53935"/>
+  <!-- Pokéball bottom half -->
+  <path d="M80 224 C106 298 175 352 256 352 C337 352 406 298 432 224Z" fill="#fafafa"/>
+  <!-- Center band -->
+  <rect x="76" y="236" width="360" height="28" rx="0" fill="#1a1a2e"/>
+  <!-- Center circle outer -->
+  <circle cx="256" cy="250" r="44" fill="#1a1a2e"/>
+  <!-- Center circle middle -->
+  <circle cx="256" cy="250" r="32" fill="#fafafa"/>
+  <!-- Center circle inner -->
+  <circle cx="256" cy="250" r="16" fill="#e53935"/>
+  <!-- Sparkle -->
+  <circle cx="226" cy="158" r="8" fill="rgba(255,255,255,0.4)"/>
+  <circle cx="210" cy="180" r="4" fill="rgba(255,255,255,0.25)"/>
+</svg>

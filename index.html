@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0078d4">
+  <meta name="description" content="Portal de gestión de cartas Pokémon TCG. Explora sets, gestiona tu colección y lista de deseos.">
+  <meta name="application-name" content="GuillePokeCardsApp">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="GuillePokeCards">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta property="og:title" content="GuillePokeCardsApp">
+  <meta property="og:description" content="Gestiona tu colección de cartas Pokémon TCG">
+  <meta property="og:type" content="website">
+  <title>GuillePokeCardsApp</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/icon.svg">
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+
+<!-- ── App Shell ──────────────────────────────────────────────────────────── -->
+<div id="app" class="app">
+
+  <!-- Progress bar (loading indicator) -->
+  <div class="progress-bar" id="progress-bar" hidden></div>
+
+  <!-- Offline bar -->
+  <div class="offline-bar" id="offline-bar">
+    ⚠️ Sin conexión · Mostrando datos en caché
+  </div>
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <header class="app-header" role="banner">
+    <div class="header-content">
+
+      <button class="icon-btn" id="back-btn" hidden aria-label="Volver atrás">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+
+      <div class="header-title">
+        <span class="app-logo" aria-hidden="true">⚡</span>
+        <h1 id="page-title">Pokédex TCG</h1>
+      </div>
+
+      <div class="header-actions">
+        <!-- Install PWA (shown when installable) -->
+        <button class="icon-btn" id="install-btn" hidden title="Instalar aplicación" aria-label="Instalar aplicación">
+          <svg viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </button>
+
+        <!-- Export -->
+        <button class="icon-btn" id="export-btn" title="Exportar colección" aria-label="Exportar colección como JSON">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </button>
+
+        <!-- Import -->
+        <button class="icon-btn" id="import-btn" title="Importar colección" aria-label="Importar colección desde JSON">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Main content ────────────────────────────────────────────────────── -->
+  <main class="app-main" id="app-main" role="main">
+
+    <!-- Browse view: all sets grouped by year -->
+    <div class="view" id="view-browse" data-view="browse">
+      <div class="view-content">
+        <div class="page-header">
+          <h2 class="page-title">Explorar Sets</h2>
+          <p class="page-subtitle">Todos los sets del Pokémon TCG</p>
+        </div>
+        <div id="sets-grid"></div>
+      </div>
+    </div>
+
+    <!-- Set detail view: cards in a set -->
+    <div class="view" id="view-set" data-view="set" hidden>
+      <div id="set-cards-grid"></div>
+    </div>
+
+    <!-- Search view -->
+    <div class="view" id="view-search" data-view="search" hidden>
+      <div class="search-header">
+        <div class="search-bar" role="search">
+          <span class="search-bar-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </span>
+          <input
+            type="search"
+            id="search-input"
+            placeholder="Buscar cartas por nombre…"
+            autocomplete="off"
+            autocorrect="off"
+            spellcheck="false"
+            aria-label="Buscar cartas"
+          >
+          <button class="search-clear" id="search-clear" aria-label="Limpiar búsqueda">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="view-content">
+        <div id="search-results">
+          <div class="search-hint">
+            <div class="search-hint-icon">🔍</div>
+            <p>Escribe el nombre de una carta para buscar</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Collection view -->
+    <div class="view" id="view-collection" data-view="collection" hidden>
+      <div class="view-content">
+        <div id="collection-content"></div>
+      </div>
+    </div>
+
+    <!-- Wishlist view -->
+    <div class="view" id="view-wishlist" data-view="wishlist" hidden>
+      <div class="view-content">
+        <div class="page-header">
+          <h2 class="page-title">Lista de Deseos</h2>
+          <p class="page-subtitle">Cartas que quieres conseguir</p>
+        </div>
+        <div id="wishlist-grid" class="cards-grid"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── Bottom navigation ───────────────────────────────────────────────── -->
+  <nav class="app-nav" role="navigation" aria-label="Navegación principal">
+
+    <button class="nav-item active" data-view="browse" aria-label="Explorar sets" aria-current="page">
+      <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span class="nav-label">Explorar</span>
+    </button>
+
+    <button class="nav-item" data-view="search" aria-label="Buscar cartas">
+      <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span class="nav-label">Buscar</span>
+    </button>
+
+    <button class="nav-item" data-view="collection" aria-label="Mi colección" style="position:relative">
+      <svg class="nav-icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+      <span class="nav-label">Colección</span>
+      <span class="nav-badge" id="coll-badge" hidden>0</span>
+    </button>
+
+    <button class="nav-item" data-view="wishlist" aria-label="Lista de deseos" style="position:relative">
+      <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+      <span class="nav-label">Deseos</span>
+      <span class="nav-badge" id="wish-badge" hidden>0</span>
+    </button>
+
+  </nav>
+</div>
+
+<!-- ── Card Detail Modal ────────────────────────────────────────────────── -->
+<div class="modal-overlay" id="modal-overlay" hidden role="dialog" aria-modal="true" aria-label="Detalle de carta">
+  <div class="modal" id="card-modal"></div>
+</div>
+
+<!-- ── Toast notifications ──────────────────────────────────────────────── -->
+<div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="false"></div>
+
+<!-- ── Hidden file input for import ─────────────────────────────────────── -->
+<input type="file" id="import-file" accept=".json" hidden aria-hidden="true">
+
+<!-- ── Scripts ──────────────────────────────────────────────────────────── -->
+<script src="./js/api.js"></script>
+<script src="./js/storage.js"></script>
+<script src="./js/app.js"></script>
+
+</body>
+</html>
