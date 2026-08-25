@@ -889,25 +889,23 @@ const App = (() => {
 
     // Service worker + auto-update
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js').then(reg => {
-        // Cuando se instala un SW nuevo, lo activa de inmediato
-        reg.addEventListener('updatefound', () => {
-          const newSW = reg.installing;
-          newSW.addEventListener('statechange', () => {
-            if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-              // Hay nueva versión lista: recargar para aplicarla
-              toast('🔄 Nueva versión disponible, actualizando…', 'info');
-              setTimeout(() => window.location.reload(), 1500);
-            }
-          });
-        });
-      }).catch(console.warn);
-
-      // Si el SW toma el control (skipWaiting), recargar la página
-      let swRefreshing = false;
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!swRefreshing) { swRefreshing = true; window.location.reload(); }
+      // Escuchar mensaje del SW cuando activa una nueva versión
+      let swReloading = false;
+      navigator.serviceWorker.addEventListener('message', event => {
+        if (event.data?.type === 'SW_UPDATED' && !swReloading) {
+          swReloading = true;
+          window.location.reload();
+        }
       });
+
+      // Fallback: si el SW toma el control sin mensaje
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!swReloading) { swReloading = true; window.location.reload(); }
+      });
+
+      navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+        .then(reg => reg.update())
+        .catch(console.warn);
     }
 
     // Offline detection
