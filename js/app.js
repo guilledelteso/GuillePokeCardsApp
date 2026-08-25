@@ -889,23 +889,7 @@ const App = (() => {
 
     // Service worker + auto-update
     if ('serviceWorker' in navigator) {
-      // Escuchar mensaje del SW cuando activa una nueva versión
-      let swReloading = false;
-      navigator.serviceWorker.addEventListener('message', event => {
-        if (event.data?.type === 'SW_UPDATED' && !swReloading) {
-          swReloading = true;
-          window.location.reload();
-        }
-      });
-
-      // Fallback: si el SW toma el control sin mensaje
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!swReloading) { swReloading = true; window.location.reload(); }
-      });
-
-      navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
-        .then(reg => reg.update())
-        .catch(console.warn);
+      navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).catch(console.warn);
     }
 
     // Offline detection
