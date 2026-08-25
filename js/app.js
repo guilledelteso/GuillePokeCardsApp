@@ -604,6 +604,8 @@ const App = (() => {
         ${abilities ? `<div class="card-section-title">Habilidades</div>${abilities}` : ''}
         ${attacks   ? `<div class="card-section-title">Ataques</div>${attacks}` : ''}
 
+        ${buildPricingHtml(card.pricing)}
+
         ${inCol ? `
           <div class="card-section-title">En tu colección</div>
           <div class="quantity-control" id="modal-qty-ctrl" data-card-id="${esc(card.id)}" style="max-width:140px">
@@ -670,6 +672,121 @@ const App = (() => {
         $('modal-qty-val').textContent = cur - 1;
       }
     });
+  }
+
+  // ── Pricing helpers ───────────────────────────────────────────────────────
+  function buildSparkline(points, color) {
+    if (points.length < 2) return '';
+    const W = 260, H = 72, P = 10;
+    const vals = points.map(p => p.v);
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    const range = max - min || 0.01;
+    const xs = points.map((_, i) => P + (i / (points.length - 1)) * (W - P * 2));
+    const ys = vals.map(v => H - P - ((v - min) / range) * (H - P * 2));
+    const line = xs.map((x, i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ');
+    const area = `${line} L${xs[xs.length-1].toFixed(1)},${H - P} L${xs[0].toFixed(1)},${H - P} Z`;
+    const dots = xs.map((x, i) => `<circle cx="${x.toFixed(1)}" cy="${ys[i].toFixed(1)}" r="3.5" fill="${color}" stroke="var(--surface)" stroke-width="1.5"/>`).join('');
+    const fillOpacity = 'rgba(' + (color === '#107c10' ? '16,124,16' : '164,38,44') + ',0.1)';
+    return `<svg class="sparkline-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
+      <path d="${area}" fill="${fillOpacity}"/>
+      <path d="${line}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      ${dots}
+    </svg>`;
+  }
+
+  function buildPricingHtml(pricing) {
+    if (!pricing) return '';
+    const cm  = pricing.cardmarket;
+    const tcp = pricing.tcgplayer;
+    if (!cm && !tcp) return '';
+
+    const fmt = (n, sym) => n != null ? `${sym}${Number(n).toFixed(2)}` : null;
+    const trendClass = (val, ref) => val == null || ref == null ? '' : val >= ref ? 'price-up' : 'price-down';
+    const trendArrow = (val, ref) => val == null || ref == null ? '' : val >= ref ? '▲' : '▼';
+
+    let html = `<div class="card-section-title">💰 Precios de Mercado</div><div class="pricing-wrap">`;
+
+    // ── Cardmarket ──────────────────────────────────────────────────────────
+    if (cm) {
+      // Pick normal or holo values (whichever is available)
+      const avg   = cm.avg   ?? cm['avg-holo'];
+      const low   = cm.low   ?? cm['low-holo'];
+      const trend = cm.trend ?? cm['trend-holo'];
+      const a1    = cm.avg1  ?? cm['avg1-holo'];
+      const a7    = cm.avg7  ?? cm['avg7-holo'];
+      const a30   = cm.avg30 ?? cm['avg30-holo'];
+      const updated = cm.updated ? new Date(cm.updated).toLocaleDateString('es-ES', {day:'2-digit',month:'short',year:'numeric'}) : '';
+
+      const pts = [
+        { label: '−30d', v: a30 }, { label: '−7d', v: a7 },
+        { label: '−1d',  v: a1  }, { label: 'Hoy', v: avg },
+      ].filter(p => p.v != null);
+
+      const rising = pts.length > 1 && pts[pts.length-1].v >= pts[0].v;
+      const color  = rising ? '#107c10' : '#a4262c';
+
+      html += `<div class="price-provider">
+        <div class="price-provider-head">
+          <span class="price-prov-name">🇪🇺 Cardmarket</span>
+          <span class="price-prov-unit">EUR</span>
+        </div>
+        <div class="price-row">
+          ${avg  != null ? `<div class="price-box price-box-main"><div class="price-box-label">Precio medio</div><div class="price-box-val">€${Number(avg).toFixed(2)}</div></div>` : ''}
+          ${low  != null ? `<div class="price-box"><div class="price-box-label">Mínimo</div><div class="price-box-val">€${Number(low).toFixed(2)}</div></div>` : ''}
+          ${trend != null ? `<div class="price-box"><div class="price-box-label">Tendencia</div><div class="price-box-val ${trendClass(trend,avg)}">${trendArrow(trend,avg)} €${Number(trend).toFixed(2)}</div></div>` : ''}
+        </div>
+        ${pts.length > 1 ? `
+          <div class="price-chart-wrap">
+            <div class="price-chart-title">Evolución histórica</div>
+            ${buildSparkline(pts, color)}
+            <div class="price-chart-labels">
+              ${pts.map(p => `<div class="price-chart-pt"><span class="price-chart-period">${p.label}</span><span class="price-chart-val" style="color:${color}">€${Number(p.v).toFixed(2)}</span></div>`).join('')}
+            </div>
+          </div>` : ''}
+        ${updated ? `<div class="price-updated">Actualizado: ${updated}</div>` : ''}
+      </div>`;
+    }
+
+    // ── TCGPlayer ────────────────────────────────────────────────────────────
+    if (tcp) {
+      const variantMap = {
+        normal:              'Normal',
+        holofoil:            'Holo',
+        reverseHolofoil:     'Reverse Holo',
+        '1stEditionNormal':  '1ª Ed. Normal',
+        '1stEditionHolofoil':'1ª Ed. Holo',
+      };
+      const variants = Object.keys(variantMap).filter(k => tcp[k]);
+      const updated  = tcp.updated ? new Date(tcp.updated).toLocaleDateString('es-ES', {day:'2-digit',month:'short',year:'numeric'}) : '';
+
+      if (variants.length) {
+        html += `<div class="price-provider">
+          <div class="price-provider-head">
+            <span class="price-prov-name">🇺🇸 TCGPlayer</span>
+            <span class="price-prov-unit">USD</span>
+          </div>`;
+
+        for (const vk of variants) {
+          const d = tcp[vk];
+          html += `<div class="tcgp-variant">
+            <div class="tcgp-variant-label">${variantMap[vk]}</div>
+            <div class="price-row">
+              ${d.marketPrice  != null ? `<div class="price-box price-box-main"><div class="price-box-label">Mercado</div><div class="price-box-val">$${Number(d.marketPrice).toFixed(2)}</div></div>` : ''}
+              ${d.lowPrice     != null ? `<div class="price-box"><div class="price-box-label">Mínimo</div><div class="price-box-val">$${Number(d.lowPrice).toFixed(2)}</div></div>` : ''}
+              ${d.midPrice     != null ? `<div class="price-box"><div class="price-box-label">Medio</div><div class="price-box-val">$${Number(d.midPrice).toFixed(2)}</div></div>` : ''}
+              ${d.highPrice    != null ? `<div class="price-box"><div class="price-box-label">Máximo</div><div class="price-box-val">$${Number(d.highPrice).toFixed(2)}</div></div>` : ''}
+            </div>
+          </div>`;
+        }
+
+        if (updated) html += `<div class="price-updated">Actualizado: ${updated}</div>`;
+        html += `</div>`;
+      }
+    }
+
+    html += `</div>`;
+    return html;
   }
 
   function closeModal() {
