@@ -887,9 +887,27 @@ const App = (() => {
   function init() {
     initDom();
 
-    // Service worker
+    // Service worker + auto-update
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js').catch(console.warn);
+      navigator.serviceWorker.register('./sw.js').then(reg => {
+        // Cuando se instala un SW nuevo, lo activa de inmediato
+        reg.addEventListener('updatefound', () => {
+          const newSW = reg.installing;
+          newSW.addEventListener('statechange', () => {
+            if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+              // Hay nueva versión lista: recargar para aplicarla
+              toast('🔄 Nueva versión disponible, actualizando…', 'info');
+              setTimeout(() => window.location.reload(), 1500);
+            }
+          });
+        });
+      }).catch(console.warn);
+
+      // Si el SW toma el control (skipWaiting), recargar la página
+      let swRefreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!swRefreshing) { swRefreshing = true; window.location.reload(); }
+      });
     }
 
     // Offline detection
